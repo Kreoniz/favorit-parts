@@ -1,8 +1,9 @@
-export function StatusPanel({ title, children }) {
+export function StatusPanel({ title, children, actions }) {
   return (
     <div className="border rounded p-4 p-md-5 text-center" role="status">
       <h2 className="fs-5 mb-2">{title}</h2>
-      <p className="text-body-secondary mb-0">{children}</p>
+      {children && <p className="text-body-secondary mb-0">{children}</p>}
+      {actions}
     </div>
   );
 }

@@ -52,7 +52,6 @@ export function createSearchUrlSync(browser) {
     if (action.meta?.history === 'replace') {
       write(current, 'replace');
     } else if (current.article !== previous.article && current.article.trim()) {
-      // One history entry per settled article, not one per keystroke.
       pending = setTimeout(() => write(getState().search, 'push'), 400);
     } else {
       write(current, current.filter !== previous.filter && current.brand === previous.brand ? 'replace' : 'push');

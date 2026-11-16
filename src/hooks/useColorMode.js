@@ -21,9 +21,7 @@ export function useColorMode() {
     setMode(value);
     try {
       localStorage.setItem('favorit-parts-theme', value);
-    } catch {
-      // Theme switching still works when browser storage is unavailable.
-    }
+    } catch {}
   }
 
   return [mode, changeMode];

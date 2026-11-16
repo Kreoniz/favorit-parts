@@ -3,7 +3,6 @@
 @import "bootstrap/scss/mixins/banner";
 @include bsBanner("");
 
-// Bootstrap 5.3 uses Sass imports internally. Keep its configuration order.
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/variables-dark";
@@ -11,8 +10,6 @@
 @import "bootstrap/scss/mixins";
 @import "bootstrap/scss/utilities";
 
-// Generate the utility families used by the UI, including responsive variants.
-// Keep native values within each family so normal Bootstrap classes still work.
 $used-utilities: ();
 @each $name in (
   "align", "overflow", "display", "border", "rounded",

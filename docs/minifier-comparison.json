@@ -1,0 +1,30 @@
+{
+  "measuredAt": "2026-11-16T14:21:10.340024+00:00",
+  "vite": "8.3.8",
+  "terser": "5.51.2",
+  "method": "Vite production build API, write=false, minify=oxc or terser, terserOptions.compress.passes=1 or 2, maxWorkers=1",
+  "compression": {
+    "gzipLevel": 6,
+    "brotliQuality": 11
+  },
+  "results": [
+    {
+      "name": "Vite / Oxc",
+      "raw": 322368,
+      "gzip": 102749,
+      "brotli": 88298
+    },
+    {
+      "name": "Vite / Terser 1 pass",
+      "raw": 322835,
+      "gzip": 103749,
+      "brotli": 88509
+    },
+    {
+      "name": "Vite / Terser 2 pass",
+      "raw": 322450,
+      "gzip": 103666,
+      "brotli": 88444
+    }
+  ]
+}

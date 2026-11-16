@@ -23,7 +23,6 @@ export function apiErrorMessage(error) {
 
 export function readGoods(response) {
   if (response?.error) throw new Error(apiErrorMessage(response.error));
-  // The documented empty response may contain a single empty object.
   if (response == null || (isRecord(response) && Object.keys(response).length === 0)) return [];
   if (Array.isArray(response) && response.every((item) => isRecord(item) && Object.keys(item).length === 0)) return [];
   if (!Array.isArray(response.goods)) throw new Error('Сервис вернул данные в неожиданном формате. Попробуйте позже.');
@@ -59,7 +58,6 @@ export function getOfferRows(parts, sort = 'default') {
   return rows.sort((a, b) => {
     const left = a.offer?.[key] ?? null;
     const right = b.offer?.[key] ?? null;
-    // Unknown prices/stocks and goods without offers always remain at the end.
     if (left === null) return right === null ? 0 : 1;
     if (right === null) return -1;
     return (left - right) * direction;
@@ -94,7 +92,6 @@ export function getParts(goods) {
     }
     parts.set(id, part);
   }
-  // Requested goods take precedence when the same part also occurs as an analogue.
   goods.forEach((item) => add(item, true));
   goods.forEach((item) => {
     if (Array.isArray(item.analogues)) item.analogues.forEach((analogue) => add(analogue, false));

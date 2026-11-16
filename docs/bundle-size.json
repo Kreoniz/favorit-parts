@@ -1,5 +1,5 @@
 {
-  "measuredAt": "2026-11-16T13:38:10.345Z",
+  "measuredAt": "2026-11-16T14:23:30.809Z",
   "compression": {
     "gzipLevel": 6,
     "brotliQuality": 11
@@ -7,27 +7,27 @@
   "files": [
     {
       "file": "index.html",
-      "raw": 1561,
-      "gzip": 864,
-      "brotli": 607
+      "raw": 1479,
+      "gzip": 814,
+      "brotli": 565
     },
     {
       "file": "favicon.svg",
-      "raw": 241,
-      "gzip": 190,
-      "brotli": 185
+      "raw": 472,
+      "gzip": 302,
+      "brotli": 271
     },
     {
-      "file": "assets/index-D6qj-b65.js",
-      "raw": 322058,
-      "gzip": 102647,
-      "brotli": 88170
+      "file": "assets/index-E_uodk2n.js",
+      "raw": 322368,
+      "gzip": 102749,
+      "brotli": 88298
     },
     {
-      "file": "assets/index-CjPgxG03.css",
-      "raw": 90898,
-      "gzip": 14327,
-      "brotli": 10400
+      "file": "assets/index-Bif1DaWO.css",
+      "raw": 91022,
+      "gzip": 14367,
+      "brotli": 10393
     }
   ]
 }

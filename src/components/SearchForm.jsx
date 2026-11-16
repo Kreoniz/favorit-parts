@@ -20,7 +20,7 @@ export function SearchForm({ article, onArticleChange, selectedBrand, onBrandSel
   }
 
   return (
-    <form className="search-form bg-body-tertiary rounded p-3 mb-4" onSubmit={(event) => event.preventDefault()} aria-label="Поиск запчастей">
+    <form className="search-form bg-body-tertiary rounded p-3 mb-3" onSubmit={(event) => event.preventDefault()} aria-label="Поиск запчастей">
       <div className="row g-3">
         <div className="col-12 col-md-6">
           <label className="form-label fw-medium" htmlFor="article">Артикул</label>

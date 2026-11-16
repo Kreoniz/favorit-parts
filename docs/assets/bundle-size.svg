@@ -1,21 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 336" role="img" aria-labelledby="title desc">
   <title id="title">Размер JavaScript и CSS в production-сборке</title>
-  <desc id="desc">assets/index-D6qj-b65.js: 322,06 КБ, gzip 102,65 КБ. assets/index-CjPgxG03.css: 90,9 КБ, gzip 14,33 КБ. Шкала каждого графика отдельная.</desc>
+  <desc id="desc">assets/index-E_uodk2n.js: 322,37 КБ, gzip 102,75 КБ. assets/index-Bif1DaWO.css: 91,02 КБ, gzip 14,37 КБ. Шкала каждого графика отдельная.</desc>
   <rect width="920" height="336" rx="12" fill="#18181b"/>
   <style>text{fill:#e4e4e7;font-family:system-ui,sans-serif}.title{font-size:21px;font-weight:600}.label{font-size:18px}.note{font-size:15px;fill:#a1a1aa}</style>
-  <g transform="translate(32,0)"><text y="42" class="title">Минифицированные файлы</text><text x="0" y="86" class="label">JavaScript<tspan x="380" text-anchor="end">322,06 КБ</tspan></text>
+  <g transform="translate(32,0)"><text y="42" class="title">Минифицированные файлы</text><text x="0" y="86" class="label">JavaScript<tspan x="380" text-anchor="end">322,37 КБ</tspan></text>
       <rect y="102" width="380" height="22" rx="4" fill="#3f3f46"/>
       <rect y="102" width="380.00" height="22" rx="4" fill="#a370f7"/>
-      <text y="145" class="note">index-D6qj-b65.js</text><text x="0" y="182" class="label">CSS<tspan x="380" text-anchor="end">90,9 КБ</tspan></text>
+      <text y="145" class="note">index-E_uodk2n.js</text><text x="0" y="182" class="label">CSS<tspan x="380" text-anchor="end">91,02 КБ</tspan></text>
       <rect y="198" width="380" height="22" rx="4" fill="#3f3f46"/>
-      <rect y="198" width="107.25" height="22" rx="4" fill="#a1a1aa"/>
-      <text y="241" class="note">index-CjPgxG03.css</text></g><g transform="translate(476,0)"><text y="42" class="title">После gzip</text><text x="0" y="86" class="label">JavaScript<tspan x="380" text-anchor="end">102,65 КБ</tspan></text>
+      <rect y="198" width="107.29" height="22" rx="4" fill="#a1a1aa"/>
+      <text y="241" class="note">index-Bif1DaWO.css</text></g><g transform="translate(476,0)"><text y="42" class="title">После gzip</text><text x="0" y="86" class="label">JavaScript<tspan x="380" text-anchor="end">102,75 КБ</tspan></text>
       <rect y="102" width="380" height="22" rx="4" fill="#3f3f46"/>
       <rect y="102" width="380.00" height="22" rx="4" fill="#a370f7"/>
-      <text y="145" class="note">index-D6qj-b65.js</text><text x="0" y="182" class="label">CSS<tspan x="380" text-anchor="end">14,33 КБ</tspan></text>
+      <text y="145" class="note">index-E_uodk2n.js</text><text x="0" y="182" class="label">CSS<tspan x="380" text-anchor="end">14,37 КБ</tspan></text>
       <rect y="198" width="380" height="22" rx="4" fill="#3f3f46"/>
-      <rect y="198" width="53.04" height="22" rx="4" fill="#a1a1aa"/>
-      <text y="241" class="note">index-CjPgxG03.css</text></g>
+      <rect y="198" width="53.13" height="22" rx="4" fill="#a1a1aa"/>
+      <text y="241" class="note">index-Bif1DaWO.css</text></g>
   <text x="32" y="285" class="note">Размеры по файлам. Шкалы графиков независимы.</text>
   <text x="32" y="311" class="note">1 КБ = 1000 байт. Сжатие рассчитано локально; способ передачи зависит от хостинга.</text>
 </svg>
