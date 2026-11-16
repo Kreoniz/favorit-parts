@@ -1,6 +1,6 @@
 name: Check and deploy to Pages
 
-on:
+"on":
   push:
     branches: [main]
   pull_request:
