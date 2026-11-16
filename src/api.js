@@ -1,9 +1,8 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { apiErrorMessage, getBrands, getParts, readGoods } from './parts';
 
-export const DEMO_KEY = '00000000-0000-0000-0000-000000000001';
-const apiKey = import.meta.env?.VITE_FAVORIT_API_KEY?.trim() || DEMO_KEY;
-export const API_URL = 'https://api.favorit-parts.ru/hs/hsprice/';
+const apiKey = import.meta.env?.VITE_FAVORIT_API_KEY?.trim();
+export const API_URL = import.meta.env?.VITE_FAVORIT_API_URL?.trim() || 'https://api.favorit-parts.ru/hs/hsprice/';
 
 const request = fetchBaseQuery({ baseUrl: API_URL, timeout: 15000 });
 
@@ -21,6 +20,10 @@ function requestErrorMessage(error) {
 export const partsApi = createApi({
   reducerPath: 'partsApi',
   baseQuery: async (params, api, extraOptions) => {
+    if (!apiKey) {
+      const message = 'Не настроен доступ к сервису. Проверьте конфигурацию приложения.';
+      return { error: { status: 'CUSTOM_ERROR', error: message, message } };
+    }
     const result = await request({ url: '', params: { key: apiKey, ...params } }, api, extraOptions);
     if (result.error) return { error: { ...result.error, message: requestErrorMessage(result.error) } };
     try {

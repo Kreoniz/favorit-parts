@@ -21,6 +21,7 @@ describe('Redux API integration', () => {
     await store.dispatch(partsApi.endpoints.getOffers.initiate({ number: 'A#1 &2', brand: 'NGK/NTK & Co' }));
     const [brandsRequest, offersRequest] = fetchSpy.mock.calls.map(([request]) => new URL(request.url));
     expect(brandsRequest.protocol).toBe('https:');
+    expect(brandsRequest.searchParams.get('key')).toBe(import.meta.env.VITE_FAVORIT_API_KEY);
     expect(brandsRequest.searchParams.get('number')).toBe('A#1 &2');
     expect(brandsRequest.searchParams.has('brand')).toBe(false);
     expect(brandsRequest.searchParams.has('analogues')).toBe(false);
