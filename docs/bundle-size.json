@@ -1,5 +1,5 @@
 {
-  "measuredAt": "2026-11-16T14:47:18.603Z",
+  "measuredAt": "2026-11-16T16:33:18.967Z",
   "compression": {
     "gzipLevel": 6,
     "brotliQuality": 11
@@ -7,9 +7,9 @@
   "files": [
     {
       "file": "index.html",
-      "raw": 1479,
-      "gzip": 814,
-      "brotli": 565
+      "raw": 1476,
+      "gzip": 807,
+      "brotli": 556
     },
     {
       "file": "favicon.svg",
