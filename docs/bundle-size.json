@@ -1,5 +1,5 @@
 {
-  "measuredAt": "2026-11-16T14:23:30.809Z",
+  "measuredAt": "2026-11-16T14:33:31.693Z",
   "compression": {
     "gzipLevel": 6,
     "brotliQuality": 11
@@ -8,8 +8,8 @@
     {
       "file": "index.html",
       "raw": 1479,
-      "gzip": 814,
-      "brotli": 565
+      "gzip": 815,
+      "brotli": 568
     },
     {
       "file": "favicon.svg",
@@ -18,10 +18,10 @@
       "brotli": 271
     },
     {
-      "file": "assets/index-E_uodk2n.js",
-      "raw": 322368,
-      "gzip": 102749,
-      "brotli": 88298
+      "file": "assets/index-CuEdeO3G.js",
+      "raw": 270530,
+      "gzip": 86514,
+      "brotli": 73964
     },
     {
       "file": "assets/index-Bif1DaWO.css",

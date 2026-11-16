@@ -68,7 +68,7 @@ export function SearchForm({ article, onArticleChange, selectedBrand, onBrandSel
         </div>
         {error && (
           <div className="col-12">
-            <ErrorAlert title="Не удалось найти производителей" onRetry={onRetry}>{error.message}</ErrorAlert>
+            <ErrorAlert title="Не удалось найти производителей" onRetry={onRetry}>{error}</ErrorAlert>
           </div>
         )}
       </div>

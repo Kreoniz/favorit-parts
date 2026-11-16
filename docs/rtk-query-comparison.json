@@ -1,0 +1,38 @@
+{
+  "measuredAt": "2026-11-16T14:33:31.693Z",
+  "baselineCommit": "103b1ac",
+  "compression": {
+    "gzipLevel": 6,
+    "brotliQuality": 11
+  },
+  "before": {
+    "js": {
+      "file": "assets/index-E_uodk2n.js",
+      "raw": 322368,
+      "gzip": 102749,
+      "brotli": 88298
+    },
+    "css": {
+      "file": "assets/index-Bif1DaWO.css",
+      "raw": 91022,
+      "gzip": 14367,
+      "brotli": 10393
+    }
+  },
+  "after": {
+    "js": {
+      "file": "assets/index-CuEdeO3G.js",
+      "raw": 270530,
+      "gzip": 86514,
+      "brotli": 73964
+    },
+    "css": {
+      "file": "assets/index-Bif1DaWO.css",
+      "raw": 91022,
+      "gzip": 14367,
+      "brotli": 10393
+    }
+  },
+  "jsGzipSaved": 16235,
+  "jsGzipReductionPercent": 15.800640395526965
+}

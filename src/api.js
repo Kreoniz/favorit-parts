@@ -1,48 +1,59 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createAsyncThunk } from '@reduxjs/toolkit';
 import { apiErrorMessage, getBrands, getParts, readGoods } from './parts';
 
 const apiKey = import.meta.env?.VITE_FAVORIT_API_KEY?.trim();
-export const API_URL = import.meta.env?.VITE_FAVORIT_API_URL?.trim() || 'https://api.favorit-parts.ru/hs/hsprice/';
+const apiUrl = import.meta.env?.VITE_FAVORIT_API_URL?.trim() || 'https://api.favorit-parts.ru/hs/hsprice/';
 
-const request = fetchBaseQuery({ baseUrl: API_URL, timeout: 15000 });
-
-function requestErrorMessage(error) {
-  if (error.data?.error) return apiErrorMessage(error.data.error);
-  if (error.status === 'TIMEOUT_ERROR') return 'Сервис не ответил за 15 секунд. Попробуйте ещё раз.';
-  if (error.status === 'FETCH_ERROR') return 'Не удалось связаться с сервисом. Проверьте подключение к интернету и повторите запрос.';
-  const status = typeof error.status === 'number' ? error.status : error.originalStatus;
-  if (status === 429) return 'Слишком много запросов. Подождите немного и попробуйте снова.';
-  if (typeof status === 'number' && status >= 400) return `Сервис временно недоступен (HTTP ${status}). Попробуйте позже.`;
-  if (error.status === 'PARSING_ERROR') return 'Сервис вернул некорректный ответ. Попробуйте позже.';
-  return 'Сервис временно недоступен. Попробуйте позже.';
+function httpError(status) {
+  return status === 429
+    ? 'Слишком много запросов. Подождите немного и попробуйте снова.'
+    : `Сервис временно недоступен (HTTP ${status}). Попробуйте позже.`;
 }
 
-export const partsApi = createApi({
-  reducerPath: 'partsApi',
-  baseQuery: async (params, api, extraOptions) => {
-    if (!apiKey) {
-      const message = 'Не настроен доступ к сервису. Проверьте конфигурацию приложения.';
-      return { error: { status: 'CUSTOM_ERROR', error: message, message } };
-    }
-    const result = await request({ url: '', params: { key: apiKey, ...params } }, api, extraOptions);
-    if (result.error) return { error: { ...result.error, message: requestErrorMessage(result.error) } };
-    try {
-      return { data: readGoods(result.data) };
-    } catch (error) {
-      return { error: { status: 'CUSTOM_ERROR', error: error.message, message: error.message } };
-    }
-  },
-  keepUnusedDataFor: 30,
-  endpoints: (builder) => ({
-    getBrands: builder.query({
-      query: (number) => ({ number }),
-      transformResponse: getBrands,
-    }),
-    getOffers: builder.query({
-      query: ({ number, brand }) => ({ number, brand, analogues: 'on' }),
-      transformResponse: getParts,
-    }),
-  }),
-});
+export async function requestGoods(params, { signal, timeoutMs = 15000 } = {}) {
+  if (!apiKey) throw new Error('Не настроен доступ к сервису. Проверьте конфигурацию приложения.');
+  const url = new URL(apiUrl);
+  url.search = new URLSearchParams({ key: apiKey, ...params });
+  const controller = new AbortController();
+  const abort = () => controller.abort();
+  if (signal?.aborted) abort();
+  signal?.addEventListener('abort', abort, { once: true });
+  let timedOut = false;
+  const timer = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, timeoutMs);
 
-export const { useGetBrandsQuery, useGetOffersQuery } = partsApi;
+  try {
+    let response;
+    let body;
+    try {
+      response = await fetch(url, { signal: controller.signal });
+      body = await response.text();
+    } catch {
+      if (signal?.aborted) throw new DOMException('Запрос отменён.', 'AbortError');
+      if (timedOut) throw new Error('Сервис не ответил за 15 секунд. Попробуйте ещё раз.');
+      throw new Error('Не удалось связаться с сервисом. Проверьте подключение к интернету и повторите запрос.');
+    }
+    let data;
+    try {
+      data = body.trim() ? JSON.parse(body) : null;
+    } catch {
+      throw new Error(response.ok ? 'Сервис вернул некорректный ответ. Попробуйте позже.' : httpError(response.status));
+    }
+    if (data?.error) throw new Error(apiErrorMessage(data.error));
+    if (!response.ok) throw new Error(httpError(response.status));
+    return readGoods(data);
+  } finally {
+    clearTimeout(timer);
+    signal?.removeEventListener('abort', abort);
+  }
+}
+
+export const loadBrands = createAsyncThunk('catalog/brands', async (number, { signal }) =>
+  getBrands(await requestGoods({ number }, { signal })),
+);
+
+export const loadOffers = createAsyncThunk('catalog/offers', async ({ number, brand }, { signal }) =>
+  getParts(await requestGoods({ number, brand, analogues: 'on' }, { signal })),
+);

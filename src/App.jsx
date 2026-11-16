@@ -1,7 +1,6 @@
-import { useEffect } from 'react';
-import { skipToken } from '@reduxjs/toolkit/query';
+import { useEffect, useReducer } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useGetBrandsQuery, useGetOffersQuery } from './api';
+import { loadBrands, loadOffers } from './api';
 import { articleChanged, brandSelected, filterChanged, searchRestored, sortChanged } from './store';
 import { useDebouncedValue } from './hooks/useDebouncedValue';
 import { useColorMode } from './hooks/useColorMode';
@@ -14,24 +13,40 @@ export default function App() {
   const dispatch = useDispatch();
   const [colorMode, setColorMode] = useColorMode();
   const { article, brand, filter, sort } = useSelector((state) => state.search);
+  const { brands: brandsRequest, offers: offersRequest } = useSelector((state) => state.catalog);
+  const [brandsRetry, retryBrands] = useReducer((value) => value + 1, 0);
+  const [offersRetry, retryOffers] = useReducer((value) => value + 1, 0);
   const number = article.trim();
   const debouncedNumber = useDebouncedValue(number);
   const waitingForInput = number !== debouncedNumber;
-  const brandsQuery = useGetBrandsQuery(number && !waitingForInput ? number : skipToken, { refetchOnMountOrArgChange: true });
-  const brands = brandsQuery.currentData ?? [];
-  const brandsLoading = Boolean(number) && (waitingForInput || brandsQuery.isFetching);
+  const brandsCurrent = brandsRequest.arg === number;
+  const brands = brandsCurrent ? brandsRequest.data : [];
+  const brandsLoading = Boolean(number) && (waitingForInput || !brandsCurrent || ['idle', 'loading'].includes(brandsRequest.status));
   const matchedBrand = !brandsLoading ? brands.find((value) => value.toLowerCase() === brand.toLowerCase()) || '' : '';
-  const offersQuery = useGetOffersQuery(number && matchedBrand ? { number, brand: matchedBrand } : skipToken, { refetchOnMountOrArgChange: true });
-  const parts = offersQuery.currentData ?? [];
-  const offersLoading = Boolean(matchedBrand) && offersQuery.isFetching;
-  const brandsError = brandsQuery.isError && !waitingForInput ? brandsQuery.error : null;
-  const hasResults = Boolean(matchedBrand) && !offersLoading && !offersQuery.isError && parts.length > 0;
+  const offersCurrent = offersRequest.arg?.number === number && offersRequest.arg?.brand === matchedBrand;
+  const parts = offersCurrent ? offersRequest.data : [];
+  const offersLoading = Boolean(matchedBrand) && (!offersCurrent || ['idle', 'loading'].includes(offersRequest.status));
+  const brandsError = brandsCurrent && !waitingForInput ? brandsRequest.error : null;
+  const offersError = offersCurrent ? offersRequest.error : null;
+  const hasResults = Boolean(matchedBrand) && !offersLoading && !offersError && parts.length > 0;
 
   useEffect(() => {
-    if (brand && !brandsLoading && brandsQuery.isSuccess && matchedBrand !== brand) {
+    if (!number || waitingForInput) return;
+    const request = dispatch(loadBrands(number));
+    return () => request.abort();
+  }, [number, waitingForInput, brandsRetry, dispatch]);
+
+  useEffect(() => {
+    if (!number || !matchedBrand) return;
+    const request = dispatch(loadOffers({ number, brand: matchedBrand }));
+    return () => request.abort();
+  }, [number, matchedBrand, offersRetry, dispatch]);
+
+  useEffect(() => {
+    if (brand && !brandsLoading && brandsRequest.status === 'succeeded' && matchedBrand !== brand) {
       dispatch(searchRestored({ article, brand: matchedBrand, filter, sort }));
     }
-  }, [article, brand, filter, sort, brandsLoading, brandsQuery.isSuccess, matchedBrand, dispatch]);
+  }, [article, brand, filter, sort, brandsLoading, brandsRequest.status, matchedBrand, dispatch]);
 
   let content;
   if (!number) {
@@ -56,8 +71,8 @@ export default function App() {
     );
   } else if (offersLoading) {
     content = <Loader>Получаем предложения и аналоги…</Loader>;
-  } else if (offersQuery.isError) {
-    content = <ErrorAlert title="Не удалось получить предложения" onRetry={offersQuery.refetch}>{offersQuery.error.message}</ErrorAlert>;
+  } else if (offersError) {
+    content = <ErrorAlert title="Не удалось получить предложения" onRetry={retryOffers}>{offersError}</ErrorAlert>;
   } else if (!parts.length) {
     content = <StatusPanel title="Детали не найдены">Выберите другого производителя или проверьте артикул.</StatusPanel>;
   }
@@ -76,7 +91,7 @@ export default function App() {
         brands={brands}
         loading={brandsLoading}
         error={brandsError}
-        onRetry={brandsQuery.refetch}
+        onRetry={retryBrands}
       />
       <section aria-label="Предложения и аналоги" aria-busy={brandsLoading || offersLoading}>
         <ResultsView
