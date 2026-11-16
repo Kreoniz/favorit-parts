@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { formatPrice, getBrands, getParts, readGoods } from './parts';
+import { filterParts, formatPrice, getBrands, getParts, readGoods } from './parts';
 
 describe('API data normalization', () => {
   test('recognizes empty and documented single-empty-object responses', () => {
@@ -9,7 +9,7 @@ describe('API data normalization', () => {
   });
 
   test('reports domain errors and unexpected response shapes', () => {
-    expect(() => readGoods({ error: ['Invalid key client!', 'Request quota exceeded!'] })).toThrow('Сервис отклонил ключ доступа. Проверьте настройки приложения. Лимит запросов к сервису исчерпан. Попробуйте позже.');
+    expect(() => readGoods({ error: ['Invalid key client!', 'Request quota exceeded!'] })).toThrow('Сервис отклонил ключ доступа. Проверьте настройки приложения. Для этого ключа исчерпан лимит поиска по грузовому ассортименту. Наличие товара проверить не удалось.');
     expect(() => readGoods({ goods: 'unavailable' })).toThrow('неожиданном формате');
   });
 
@@ -37,5 +37,23 @@ describe('API data normalization', () => {
     expect(result).toHaveLength(1);
     expect(result[0].offers).toHaveLength(2);
     expect(result[0].requested).toBe(true);
+  });
+});
+
+describe('local results search', () => {
+  const parts = [
+    { name: 'Фильтр масляный', brand: 'MANN', number: 'W 75/3' },
+    { name: 'Бендикс стартера', brand: 'TESLA TECHNICS', number: 'TT-61027' },
+  ];
+
+  test('matches multiple terms across name, brand and article regardless of case or article punctuation', () => {
+    expect(filterParts(parts, 'фильтр mann w753')).toEqual([parts[0]]);
+    expect(filterParts(parts, 'tesla TT61027')).toEqual([parts[1]]);
+    expect(filterParts(parts, 'БЕНДИКС')).toEqual([parts[1]]);
+  });
+
+  test('returns no matches and restores all parts for an empty filter', () => {
+    expect(filterParts(parts, 'ZEN')).toEqual([]);
+    expect(filterParts(parts, '  ')).toEqual(parts);
   });
 });

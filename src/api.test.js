@@ -35,6 +35,15 @@ describe('Redux API integration', () => {
     expect(result.error.message).toContain('ключ доступа');
   });
 
+  test('reports the HAFFEN HTTP 403 quota response as a cargo-search limit, not an empty result', async () => {
+    fetchSpy.mockResolvedValue(Response.json({ error: 'Request quota exceeded!' }, { status: 403 }));
+    const result = await store.dispatch(partsApi.endpoints.getOffers.initiate({ number: '0189', brand: 'HAFFEN' }));
+    expect(result.isError).toBe(true);
+    expect(result.error.message).toContain('лимит поиска по грузовому ассортименту');
+    expect(result.error.message).toContain('Наличие товара проверить не удалось');
+    expect(result.data).toBeUndefined();
+  });
+
   test('handles server, network, and invalid JSON responses', async () => {
     fetchSpy.mockResolvedValueOnce(new Response('Unavailable', { status: 503 }));
     fetchSpy.mockRejectedValueOnce(new TypeError('Failed to fetch'));

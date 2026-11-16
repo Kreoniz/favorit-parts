@@ -7,7 +7,7 @@ export function apiErrorMessage(error) {
     ['Empty key!', 'Не указан ключ доступа к API.'],
     ['Invalid key client!', 'Сервис отклонил ключ доступа. Проверьте настройки приложения.'],
     ['Empty number goods!', 'Введите артикул детали.'],
-    ['Request quota exceeded!', 'Лимит запросов к сервису исчерпан. Попробуйте позже.'],
+    ['Request quota exceeded!', 'Для этого ключа исчерпан лимит поиска по грузовому ассортименту. Наличие товара проверить не удалось.'],
   ];
   const matched = messages.filter(([code]) => description.includes(code));
   return matched.length ? matched.map(([, message]) => message).join(' ') : 'Сервис вернул ошибку. Попробуйте повторить запрос позже.';
@@ -30,6 +30,16 @@ export function getBrands(goods) {
     if (brand && !brands.has(key)) brands.set(key, brand);
   }
   return [...brands.values()].sort((a, b) => a.localeCompare(b));
+}
+
+export function filterParts(parts, query) {
+  const normalize = (value) => value.toLocaleLowerCase('ru').replace(/[^\p{L}\p{N}]/gu, '');
+  const terms = query.trim().split(/\s+/u).map(normalize).filter(Boolean);
+  if (!terms.length) return parts;
+  return parts.filter((part) => {
+    const searchable = normalize(`${part.name} ${part.brand} ${part.number}`);
+    return terms.every((term) => searchable.includes(term));
+  });
 }
 
 function nonNegativeNumber(value) {

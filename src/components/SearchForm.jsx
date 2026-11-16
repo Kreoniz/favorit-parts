@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { X } from 'lucide-react';
 import { plural } from '../parts';
 import { ErrorAlert } from './StatusPanel';
 
@@ -19,7 +20,7 @@ export function SearchForm({ article, onArticleChange, selectedBrand, onBrandSel
   }
 
   return (
-    <form className="search-form bg-body-tertiary rounded p-3 p-md-4 mb-4" onSubmit={(event) => event.preventDefault()} aria-label="Поиск запчастей">
+    <form className="search-form bg-body-tertiary rounded p-3 mb-4" onSubmit={(event) => event.preventDefault()} aria-label="Поиск запчастей">
       <div className="row g-3">
         <div className="col-12 col-md-6">
           <label className="form-label fw-medium" htmlFor="article">Артикул</label>
@@ -34,18 +35,18 @@ export function SearchForm({ article, onArticleChange, selectedBrand, onBrandSel
               placeholder="Номер детали"
               autoComplete="off"
               spellCheck={false}
-              aria-describedby="article-hint"
             />
             <button className="btn btn-outline-secondary px-3" type="button" onClick={clear} disabled={!article} aria-label="Очистить артикул">
-              <span aria-hidden="true">×</span>
+              <X size={16} aria-hidden="true" />
             </button>
           </div>
-          <p className="form-text mb-0 mt-2" id="article-hint">
-            Например, <button className="btn btn-link p-0 align-baseline example-button" type="button" onClick={() => onArticleChange('0189')}>0189</button>. Поиск после ввода.
-          </p>
         </div>
         <div className="col-12 col-md-6" aria-busy={loading}>
-          <label className="form-label fw-medium" htmlFor="manufacturer">Производитель</label>
+          <div className="d-flex justify-content-between align-items-center gap-2 mb-2">
+            <label className="form-label fw-medium mb-0" htmlFor="manufacturer">Производитель</label>
+            {loading ? <span className="spinner-border spinner-border-sm text-primary" aria-hidden="true" />
+              : !error && brands.length > 0 ? <span className="small text-body-secondary" aria-hidden="true">{brands.length}</span> : null}
+          </div>
           <select
             id="manufacturer"
             className="form-select"
@@ -57,8 +58,8 @@ export function SearchForm({ article, onArticleChange, selectedBrand, onBrandSel
             <option value="">{placeholder}</option>
             {!disabled && brands.map((brand) => <option key={brand} value={brand}>{brand}</option>)}
           </select>
-          <p className="form-text mb-0 mt-2" id="manufacturer-hint" role="status">
-            {loading ? <><span className="spinner-border spinner-border-sm me-2" aria-hidden="true" />Ищем производителей…</>
+          <p className="visually-hidden" id="manufacturer-hint" role="status">
+            {loading ? 'Ищем производителей…'
               : !hasArticle ? 'Список появится после поиска.'
                 : error ? 'Повторите запрос ниже.'
                   : brands.length ? `Найдено ${plural(brands.length, ['производитель', 'производителя', 'производителей'])}.`

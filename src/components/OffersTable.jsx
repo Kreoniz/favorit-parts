@@ -9,8 +9,9 @@ function PartDetails({ part, showType = true }) {
   return (
     <>
       <div className="fw-semibold text-break">{part.name}</div>
-      <div className="small text-body-secondary text-break mt-1">{part.brand} · {part.number || '—'}</div>
-      {showType && <div className="small text-body-secondary mt-1">{part.requested ? 'Искомая деталь' : 'Аналог'}</div>}
+      <div className="small text-body-secondary text-break mt-1">
+        {part.brand} · {part.number || '—'}{showType && ` · ${part.requested ? 'Искомая' : 'Аналог'}`}
+      </div>
     </>
   );
 }
@@ -23,7 +24,7 @@ export function OffersTable({ parts }) {
   return (
     <>
       <div className="d-none d-md-block border rounded overflow-hidden">
-        <table className="table table-hover align-middle offers-table mb-0">
+        <table className="table table-sm table-hover align-middle offers-table mb-0">
           <caption className="visually-hidden">Запрошенная деталь и аналоги: складские предложения, цены в рублях.</caption>
           <thead>
             <tr>
