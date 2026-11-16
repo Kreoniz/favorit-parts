@@ -1,5 +1,7 @@
 # Favorit Parts
 
+[Открыть приложение](https://kreoniz.github.io/favorit-parts/) · [Пример поиска 0189 / ZEN](https://kreoniz.github.io/favorit-parts/?number=0189&brand=ZEN) · [GitHub](https://github.com/Kreoniz/favorit-parts)
+
 ![Тёмная тема, поиск 0189 и производитель ZEN](docs/assets/search-dark.png)
 
 React-приложение для поиска автозапчастей и аналогов через API Favorit Parts. JavaScript без TypeScript, Redux Toolkit / RTK Query, Bootstrap, Lucide, Vite и Bun.
@@ -111,15 +113,13 @@ bun run size
 
 ## GitHub Pages
 
-Подготовлен workflow `.github/workflows/pages.yml`: установка из lockfile, тесты, сборка и публикация после push в `main`. В pull request выполняются только тесты и сборка.
+Сайт: [kreoniz.github.io/favorit-parts](https://kreoniz.github.io/favorit-parts/). Исходники: [Kreoniz/favorit-parts](https://github.com/Kreoniz/favorit-parts).
 
-Для публикации:
+Workflow `.github/workflows/pages.yml` устанавливает зависимости из lockfile, запускает тесты, собирает и публикует приложение после push в `main`. В pull request выполняются только тесты и сборка.
 
-1. Загрузить проект в GitHub-репозиторий.
-2. В **Settings → Pages → Build and deployment → Source** выбрать **GitHub Actions**.
-3. Сделать push в `main` или запустить workflow **Check and deploy to Pages** вручную из `main`.
+В настройках Pages используется источник **GitHub Actions**. Для повторной публикации достаточно push в `main`; также можно запустить workflow **Check and deploy to Pages** вручную из `main`.
 
-`base: './'` позволяет разместить сборку как в корне домена, так и по пути `/<имя-репозитория>/`. Сервер приложению не нужен: HTTPS API разрешает CORS для обычных GET-запросов. Конфигурация Pages подготовлена; внешняя публикация в рамках локальной реализации не выполнялась.
+`base: './'` позволяет разместить сборку как в корне домена, так и по пути `/<имя-репозитория>/`. Сервер приложению не нужен: HTTPS API разрешает CORS для обычных GET-запросов.
 
 ## Устройство проекта
 
