@@ -1,25 +1,74 @@
 import { formatPrice } from '../parts';
-import { Icon } from './Icon';
 
 function Stock({ value }) {
-  if (value === null) return <span className="stock-unknown">Не указан</span>;
-  return <span className={`stock ${value > 0 ? 'in-stock' : ''}`}><span className="stock-dot" />{value} шт.</span>;
+  if (value === null) return <span className="text-body-secondary">Не указан</span>;
+  return <span className={`text-nowrap tabular-numbers ${value > 0 ? 'text-success-emphasis' : 'text-body-secondary'}`}>{value} шт.</span>;
+}
+
+function PartDetails({ part, showType = true }) {
+  return (
+    <>
+      <div className="fw-semibold text-break">{part.name}</div>
+      <div className="small text-body-secondary text-break mt-1">{part.brand} · {part.number || '—'}</div>
+      {showType && <div className="small text-body-secondary mt-1">{part.requested ? 'Искомая деталь' : 'Аналог'}</div>}
+    </>
+  );
+}
+
+function OfferStock({ offer }) {
+  return offer ? <Stock value={offer.stock} /> : <span className="text-body-secondary">Нет предложений</span>;
 }
 
 export function OffersTable({ parts }) {
-  return <>
-    <div className="panel offers-table-wrap">
-      <table className="table offers-table mb-0">
-        <caption className="visually-hidden">Запрошенные детали и аналоги: предложения по каждому складу. Цены в рублях.</caption>
-        <thead><tr><th scope="col">Деталь / производитель</th><th scope="col">Склад</th><th scope="col">Остаток</th><th scope="col" className="text-end">Цена</th></tr></thead>
-        <tbody>{parts.flatMap((part) => (part.offers.length ? part.offers : [null]).map((offer, index) => <tr key={`${part.id}:${offer?.id ?? 'no-offers'}`}>
-          <td className="part-cell"><div className="part-name">{part.name}</div><div className="part-details"><span>{part.brand} · <span className="part-number">{part.number || '—'}</span></span>{index === 0 && <span className={`part-tag ${part.requested ? 'requested' : ''}`}>{part.requested ? 'Запрошенная деталь' : 'Аналог'}</span>}</div></td>
-          <td className="warehouse-cell" data-label="Склад">{offer?.warehouse ?? '—'}</td>
-          <td className="stock-cell" data-label="Остаток">{offer ? <Stock value={offer.stock} /> : <span className="stock-unknown">Нет предложений</span>}</td>
-          <td className={`price-cell ${offer?.price == null ? 'price-missing' : ''}`} data-label="Цена">{formatPrice(offer?.price ?? null)}</td>
-        </tr>))}</tbody>
-      </table>
-    </div>
-    <p className="table-note"><Icon name="info" /><span>Цена и остаток указаны для каждого склада. Прочерк означает, что цена не предоставлена.</span></p>
-  </>;
+  return (
+    <>
+      <div className="d-none d-md-block border rounded overflow-hidden">
+        <table className="table table-hover align-middle offers-table mb-0">
+          <caption className="visually-hidden">Запрошенная деталь и аналоги: складские предложения, цены в рублях.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Деталь</th>
+              <th scope="col">Склад</th>
+              <th scope="col" className="text-end">Остаток</th>
+              <th scope="col" className="text-end">Цена</th>
+            </tr>
+          </thead>
+          <tbody>
+            {parts.flatMap((part) => (part.offers.length ? part.offers : [null]).map((offer, index) => (
+              <tr key={`${part.id}:${offer?.id ?? 'no-offers'}`}>
+                <td><PartDetails part={part} showType={index === 0} /></td>
+                <td className="small text-body-secondary text-break">{offer?.warehouse ?? '—'}</td>
+                <td className="small text-end"><OfferStock offer={offer} /></td>
+                <td className={`text-end text-nowrap fw-semibold tabular-numbers ${offer?.price == null ? 'text-body-secondary' : ''}`}>
+                  {formatPrice(offer?.price ?? null)}
+                </td>
+              </tr>
+            )))}
+          </tbody>
+        </table>
+      </div>
+      <div className="d-md-none border rounded overflow-hidden">
+        <div className="list-group list-group-flush" aria-label="Складские предложения">
+          {parts.map((part) => (
+            <article className="list-group-item p-3" key={part.id}>
+              <PartDetails part={part} />
+              {(part.offers.length ? part.offers : [null]).map((offer, index) => (
+                <dl className={`row g-1 small mb-0 mt-3 ${index > 0 ? 'border-top pt-3' : ''}`} key={offer?.id ?? 'no-offers'}>
+                  <dt className="col-5 fw-normal text-body-secondary">Склад</dt>
+                  <dd className="col-7 text-end text-break mb-1">{offer?.warehouse ?? '—'}</dd>
+                  <dt className="col-5 fw-normal text-body-secondary">Остаток</dt>
+                  <dd className="col-7 text-end mb-1"><OfferStock offer={offer} /></dd>
+                  <dt className="col-5 fw-normal text-body-secondary">Цена</dt>
+                  <dd className={`col-7 text-end fw-semibold tabular-numbers fs-6 mb-0 ${offer?.price == null ? 'text-body-secondary' : ''}`}>
+                    {formatPrice(offer?.price ?? null)}
+                  </dd>
+                </dl>
+              ))}
+            </article>
+          ))}
+        </div>
+      </div>
+      <p className="small text-body-secondary mt-3 mb-0">Цена и остаток — для указанного склада. Прочерк означает, что цена не предоставлена.</p>
+    </>
+  );
 }

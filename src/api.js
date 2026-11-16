@@ -3,7 +3,6 @@ import { apiErrorMessage, getBrands, getParts, readGoods } from './parts';
 
 export const DEMO_KEY = '00000000-0000-0000-0000-000000000001';
 const apiKey = import.meta.env?.VITE_FAVORIT_API_KEY?.trim() || DEMO_KEY;
-export const usesDemoKey = apiKey === DEMO_KEY;
 export const API_URL = 'https://api.favorit-parts.ru/hs/hsprice/';
 
 const request = fetchBaseQuery({ baseUrl: API_URL, timeout: 15000 });
