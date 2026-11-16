@@ -1,0 +1,33 @@
+{
+  "measuredAt": "2026-11-16T13:38:10.345Z",
+  "compression": {
+    "gzipLevel": 6,
+    "brotliQuality": 11
+  },
+  "files": [
+    {
+      "file": "index.html",
+      "raw": 1561,
+      "gzip": 864,
+      "brotli": 607
+    },
+    {
+      "file": "favicon.svg",
+      "raw": 241,
+      "gzip": 190,
+      "brotli": 185
+    },
+    {
+      "file": "assets/index-D6qj-b65.js",
+      "raw": 322058,
+      "gzip": 102647,
+      "brotli": 88170
+    },
+    {
+      "file": "assets/index-CjPgxG03.css",
+      "raw": 90898,
+      "gzip": 14327,
+      "brotli": 10400
+    }
+  ]
+}

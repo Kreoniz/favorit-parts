@@ -105,7 +105,7 @@ export function getParts(goods) {
 const currency = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' });
 const pluralRules = new Intl.PluralRules('ru');
 
-export const formatPrice = (value) => value === null ? '—' : currency.format(value);
+export const formatPrice = (value) => value === null ? '-' : currency.format(value);
 export function plural(count, forms) {
   const index = { one: 0, few: 1, many: 2, other: 2 }[pluralRules.select(count)];
   return `${count} ${forms[index]}`;

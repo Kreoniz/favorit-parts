@@ -26,7 +26,7 @@ describe('API data normalization', () => {
     expect(normalized[0].offers.map(({ price, stock }) => ({ price, stock }))).toEqual([{ price: 1040.6, stock: 4 }, { price: 0, stock: 0 }, { price: null, stock: 3 }]);
     expect(normalized[0].offers[2].warehouse).toBe('Склад 3');
     expect(normalized[1]).toMatchObject({ brand: 'CARGO', number: '130432', requested: false, offers: [] });
-    expect(formatPrice(null)).toBe('—');
+    expect(formatPrice(null)).toBe('-');
     expect(formatPrice(0)).toContain('0,00');
   });
 

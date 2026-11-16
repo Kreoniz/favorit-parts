@@ -10,7 +10,7 @@ function PartDetails({ part }) {
     <>
       <div className="fw-semibold text-break">{part.name}</div>
       <div className="small text-body-secondary text-break mt-1">
-        {part.brand} · {part.number || '—'} · {part.requested ? 'Искомая' : 'Аналог'}
+        {part.brand} · {part.number || '-'} · {part.requested ? 'Искомая' : 'Аналог'}
       </div>
     </>
   );
@@ -38,7 +38,7 @@ export function OffersTable({ rows }) {
             {rows.map(({ part, offer }) => (
               <tr key={`${part.id}:${offer?.id ?? 'no-offers'}`}>
                 <td><PartDetails part={part} /></td>
-                <td className="small text-body-secondary text-break">{offer?.warehouse ?? '—'}</td>
+                <td className="small text-body-secondary text-break">{offer?.warehouse ?? '-'}</td>
                 <td className="small text-end"><OfferStock offer={offer} /></td>
                 <td className={`text-end text-nowrap fw-semibold tabular-numbers ${offer?.price == null ? 'text-body-secondary' : ''}`}>
                   {formatPrice(offer?.price ?? null)}
@@ -55,7 +55,7 @@ export function OffersTable({ rows }) {
               <PartDetails part={part} />
               <dl className="row g-1 small mb-0 mt-3">
                 <dt className="col-5 fw-normal text-body-secondary">Склад</dt>
-                <dd className="col-7 text-end text-break mb-1">{offer?.warehouse ?? '—'}</dd>
+                <dd className="col-7 text-end text-break mb-1">{offer?.warehouse ?? '-'}</dd>
                 <dt className="col-5 fw-normal text-body-secondary">Остаток</dt>
                 <dd className="col-7 text-end mb-1"><OfferStock offer={offer} /></dd>
                 <dt className="col-5 fw-normal text-body-secondary">Цена</dt>
@@ -67,7 +67,7 @@ export function OffersTable({ rows }) {
           ))}
         </div>
       </div>
-      <p className="small text-body-secondary mt-3 mb-0">Цена и остаток — для указанного склада. Прочерк означает, что цена не предоставлена.</p>
+      <p className="small text-body-secondary mt-3 mb-0">Цена и остаток для указанного склада. Прочерк означает, что цена не предоставлена.</p>
     </>
   );
 }

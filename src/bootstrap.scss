@@ -1,0 +1,43 @@
+@use "sass:map";
+
+@import "bootstrap/scss/mixins/banner";
+@include bsBanner("");
+
+// Bootstrap 5.3 uses Sass imports internally. Keep its configuration order.
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
+
+// Generate the utility families used by the UI, including responsive variants.
+// Keep native values within each family so normal Bootstrap classes still work.
+$used-utilities: ();
+@each $name in (
+  "align", "overflow", "display", "border", "rounded",
+  "flex-direction", "flex-shrink", "flex-wrap", "justify-content", "align-items",
+  "margin-top", "margin-bottom", "padding", "padding-x", "padding-y", "gap",
+  "font-size", "font-weight", "text-align", "white-space", "word-wrap",
+  "color", "text-color", "background-color"
+) {
+  $used-utilities: map.set($used-utilities, $name, map.get($utilities, $name));
+}
+$utilities: $used-utilities;
+
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/containers";
+@import "bootstrap/scss/grid";
+@import "bootstrap/scss/tables";
+@import "bootstrap/scss/forms/labels";
+@import "bootstrap/scss/forms/form-control";
+@import "bootstrap/scss/forms/form-select";
+@import "bootstrap/scss/forms/input-group";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/alert";
+@import "bootstrap/scss/list-group";
+@import "bootstrap/scss/spinners";
+@import "bootstrap/scss/helpers/visually-hidden";
+@import "bootstrap/scss/utilities/api";
