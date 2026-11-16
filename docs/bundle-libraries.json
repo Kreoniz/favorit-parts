@@ -1,0 +1,94 @@
+{
+  "measuredAt": "2026-11-16T14:50:21.185Z",
+  "method": "Minified UTF-8 bytes attributed with rollup-plugin-visualizer sourcemaps; unmapped bytes included in runtime",
+  "gzipLevel": 6,
+  "chunks": [
+    {
+      "file": "assets/index-E_uodk2n.js",
+      "raw": 322368,
+      "gzip": 102749
+    },
+    {
+      "file": "assets/index-Bif1DaWO.css",
+      "raw": 91022,
+      "gzip": 14367
+    }
+  ],
+  "libraries": [
+    {
+      "name": "react-dom",
+      "bytes": 206939,
+      "percent": 64.19340629342862
+    },
+    {
+      "name": "RTK Query",
+      "bytes": 45331,
+      "percent": 14.061879591026404
+    },
+    {
+      "name": "Приложение",
+      "bytes": 20216,
+      "percent": 6.2710939051022425
+    },
+    {
+      "name": "immer",
+      "bytes": 12835,
+      "percent": 3.9814745880484415
+    },
+    {
+      "name": "@reduxjs/toolkit",
+      "bytes": 10261,
+      "percent": 3.1830082390311696
+    },
+    {
+      "name": "react",
+      "bytes": 8150,
+      "percent": 2.528166567401231
+    },
+    {
+      "name": "lucide-react",
+      "bytes": 4201,
+      "percent": 1.3031690490371253
+    },
+    {
+      "name": "scheduler",
+      "bytes": 3479,
+      "percent": 1.079201409569188
+    },
+    {
+      "name": "react-redux",
+      "bytes": 2893,
+      "percent": 0.8974215803057375
+    },
+    {
+      "name": "reselect",
+      "bytes": 2783,
+      "percent": 0.8632990867579909
+    },
+    {
+      "name": "redux",
+      "bytes": 2761,
+      "percent": 0.8564745880484415
+    },
+    {
+      "name": "Служебный код",
+      "bytes": 1539,
+      "percent": 0.47740470518165573
+    },
+    {
+      "name": "use-sync-external-store",
+      "bytes": 764,
+      "percent": 0.23699622791344055
+    },
+    {
+      "name": "@standard-schema/utils",
+      "bytes": 109,
+      "percent": 0.03381228906094898
+    },
+    {
+      "name": "redux-thunk",
+      "bytes": 107,
+      "percent": 0.03319188008735358
+    }
+  ]
+}
