@@ -1,5 +1,7 @@
 # Favorit Parts
 
+[![Проверка и публикация](https://github.com/Kreoniz/favorit-parts/actions/workflows/pages.yml/badge.svg)](https://github.com/Kreoniz/favorit-parts/actions/workflows/pages.yml)
+
 [Открыть приложение](https://kreoniz.github.io/favorit-parts/) · [Пример поиска 0189 / ZEN](https://kreoniz.github.io/favorit-parts/?number=0189&brand=ZEN) · [GitHub](https://github.com/Kreoniz/favorit-parts)
 
 ![Тёмная тема, поиск 0189 и производитель ZEN](docs/assets/search-dark.png)
