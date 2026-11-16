@@ -2,8 +2,8 @@ import { Monitor, Moon, Sun } from 'lucide-react';
 
 const modes = [
   { value: 'auto', label: 'системная', icon: Monitor },
-  { value: 'light', label: 'светлая', icon: Sun },
   { value: 'dark', label: 'тёмная', icon: Moon },
+  { value: 'light', label: 'светлая', icon: Sun },
 ];
 
 export function ThemeToggle({ mode, onChange }) {

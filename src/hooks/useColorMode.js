@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 export function useColorMode() {
-  const [mode, setMode] = useState(() => document.documentElement.dataset.themePreference || 'auto');
+  const [mode, setMode] = useState(() => document.documentElement.dataset.themePreference || 'dark');
 
   useEffect(() => {
     const system = window.matchMedia('(prefers-color-scheme: dark)');

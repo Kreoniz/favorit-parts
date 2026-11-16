@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { filterParts, formatPrice, getBrands, getParts, readGoods } from './parts';
+import { filterParts, formatPrice, getBrands, getOfferRows, getParts, readGoods } from './parts';
 
 describe('API data normalization', () => {
   test('recognizes empty and documented single-empty-object responses', () => {
@@ -55,5 +55,26 @@ describe('local results search', () => {
   test('returns no matches and restores all parts for an empty filter', () => {
     expect(filterParts(parts, 'ZEN')).toEqual([]);
     expect(filterParts(parts, '  ')).toEqual(parts);
+  });
+});
+
+describe('warehouse-offer sorting', () => {
+  const parts = [
+    { id: 'a', name: 'Фильтр', offers: [{ id: 'a1', price: 100, stock: 2 }, { id: 'a2', price: 500, stock: 9 }] },
+    { id: 'b', name: 'Бендикс', offers: [{ id: 'b1', price: 0, stock: 0 }] },
+    { id: 'c', name: 'Свеча', offers: [{ id: 'c1', price: null, stock: null }] },
+    { id: 'd', name: 'Ролик', offers: [] },
+  ];
+
+  test('sorts all warehouse offers together, retaining zero prices and putting unknown prices last in both directions', () => {
+    expect(getOfferRows(parts, 'price-asc').map((row) => row.offer?.price ?? null)).toEqual([0, 100, 500, null, null]);
+    expect(getOfferRows(parts, 'price-desc').map((row) => row.offer?.price ?? null)).toEqual([500, 100, 0, null, null]);
+    expect(parts[0].offers.map((offer) => offer.price)).toEqual([100, 500]);
+  });
+
+  test('sorts stocks and names, retaining goods without offers', () => {
+    expect(getOfferRows(parts, 'stock-desc').map((row) => row.offer?.stock ?? null)).toEqual([9, 2, 0, null, null]);
+    expect(getOfferRows(parts, 'name-asc').map((row) => row.part.name)).toEqual(['Бендикс', 'Ролик', 'Свеча', 'Фильтр', 'Фильтр']);
+    expect(getOfferRows(parts).map((row) => row.part.id)).toEqual(['a', 'a', 'b', 'c', 'd']);
   });
 });

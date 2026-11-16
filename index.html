@@ -7,10 +7,10 @@
     <script>
       // Apply the stored or system theme before styles and React paint the page.
       (() => {
-        let mode = 'auto';
+        let mode = 'dark';
         try {
           const saved = localStorage.getItem('favorit-parts-theme');
-          if (['light', 'dark'].includes(saved)) mode = saved;
+          if (['auto', 'light', 'dark'].includes(saved)) mode = saved;
         } catch {}
         const resolved = mode === 'auto' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : mode;
         document.documentElement.dataset.bsTheme = resolved;

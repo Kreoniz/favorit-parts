@@ -1,7 +1,8 @@
+import { useEffect } from 'react';
 import { skipToken } from '@reduxjs/toolkit/query';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetBrandsQuery, useGetOffersQuery } from './api';
-import { articleChanged, brandSelected } from './store';
+import { articleChanged, brandSelected, filterChanged, searchRestored, sortChanged } from './store';
 import { useDebouncedValue } from './hooks/useDebouncedValue';
 import { useColorMode } from './hooks/useColorMode';
 import { SearchForm } from './components/SearchForm';
@@ -12,19 +13,27 @@ import { ErrorAlert, Loader, StatusPanel } from './components/StatusPanel';
 export default function App() {
   const dispatch = useDispatch();
   const [colorMode, setColorMode] = useColorMode();
-  const { article, brand } = useSelector((state) => state.search);
+  const { article, brand, filter, sort } = useSelector((state) => state.search);
   const number = article.trim();
   const debouncedNumber = useDebouncedValue(number);
   const waitingForInput = number !== debouncedNumber;
   const brandsQuery = useGetBrandsQuery(number && !waitingForInput ? number : skipToken, { refetchOnMountOrArgChange: true });
-  const offersQuery = useGetOffersQuery(number && brand ? { number, brand } : skipToken, { refetchOnMountOrArgChange: true });
   // currentData is scoped to the current arguments; responses for older inputs cannot appear here.
   const brands = brandsQuery.currentData ?? [];
-  const parts = offersQuery.currentData ?? [];
   const brandsLoading = Boolean(number) && (waitingForInput || brandsQuery.isFetching);
-  const offersLoading = Boolean(brand) && offersQuery.isFetching;
+  const matchedBrand = !brandsLoading ? brands.find((value) => value.toLowerCase() === brand.toLowerCase()) || '' : '';
+  const offersQuery = useGetOffersQuery(number && matchedBrand ? { number, brand: matchedBrand } : skipToken, { refetchOnMountOrArgChange: true });
+  const parts = offersQuery.currentData ?? [];
+  const offersLoading = Boolean(matchedBrand) && offersQuery.isFetching;
   const brandsError = brandsQuery.isError && !waitingForInput ? brandsQuery.error : null;
-  const hasResults = Boolean(brand) && !offersLoading && !offersQuery.isError && parts.length > 0;
+  const hasResults = Boolean(matchedBrand) && !offersLoading && !offersQuery.isError && parts.length > 0;
+
+  useEffect(() => {
+    if (brand && !brandsLoading && brandsQuery.isSuccess && matchedBrand !== brand) {
+      // Canonicalize a linked brand after stage one, without adding a history entry.
+      dispatch(searchRestored({ article, brand: matchedBrand, filter, sort }));
+    }
+  }, [article, brand, filter, sort, brandsLoading, brandsQuery.isSuccess, matchedBrand, dispatch]);
 
   let content;
   if (!number) {
@@ -33,7 +42,7 @@ export default function App() {
     content = null;
   } else if (!brands.length) {
     content = <StatusPanel title="Производители не найдены">Проверьте артикул или попробуйте другой номер.</StatusPanel>;
-  } else if (!brand) {
+  } else if (!matchedBrand) {
     content = <StatusPanel title="Выберите производителя">После выбора появятся цены, остатки и аналоги детали.</StatusPanel>;
   } else if (offersLoading) {
     content = <Loader>Получаем предложения и аналоги…</Loader>;
@@ -42,7 +51,17 @@ export default function App() {
   } else if (!parts.length) {
     content = <StatusPanel title="Детали не найдены">Выберите другого производителя или проверьте артикул.</StatusPanel>;
   } else {
-    content = <ResultsView key={JSON.stringify([number, brand])} parts={parts} brand={brand} number={number} />;
+    content = (
+      <ResultsView
+        parts={parts}
+        brand={matchedBrand}
+        number={number}
+        query={filter}
+        onQueryChange={(value) => dispatch(filterChanged(value))}
+        sort={sort}
+        onSortChange={(value) => dispatch(sortChanged(value))}
+      />
+    );
   }
 
   return (
@@ -54,7 +73,7 @@ export default function App() {
       <SearchForm
         article={article}
         onArticleChange={(value) => dispatch(articleChanged(value))}
-        selectedBrand={brand}
+        selectedBrand={matchedBrand}
         onBrandSelect={(value) => dispatch(brandSelected(value))}
         brands={brands}
         loading={brandsLoading}
@@ -62,9 +81,9 @@ export default function App() {
         onRetry={brandsQuery.refetch}
       />
       <section aria-label="Предложения и аналоги" aria-busy={offersLoading}>
-        {brand && !hasResults && (
+        {matchedBrand && !hasResults && (
           <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-            <h2 className="fs-5 fw-semibold text-break mb-0">{brand} · {number}</h2>
+            <h2 className="fs-5 fw-semibold text-break mb-0">{matchedBrand} · {number}</h2>
           </div>
         )}
         {content}

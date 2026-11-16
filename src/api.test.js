@@ -79,6 +79,6 @@ describe('Redux API integration', () => {
     store.dispatch(articleChanged('0189'));
     store.dispatch(brandSelected('ZEN'));
     store.dispatch(articleChanged('01089'));
-    expect(store.getState().search).toEqual({ article: '01089', brand: '' });
+    expect(store.getState().search).toEqual({ article: '01089', brand: '', filter: '', sort: 'default' });
   });
 });

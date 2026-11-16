@@ -73,7 +73,9 @@
 .form-control:focus, .form-select:focus { border-color: var(--bs-link-color); box-shadow: 0 0 0 .25rem var(--bs-focus-ring-color); }
 .btn { min-height: 44px; }
 .theme-toggle { width: 44px; padding: 0; }
+.results-tools { min-width: 0; }
 .results-search { width: 340px; max-width: 100%; }
+.results-sort { width: 210px; flex-shrink: 0; }
 button:focus-visible, a:focus-visible { outline: 3px solid var(--bs-link-color); outline-offset: 3px; }
 .tabular-numbers { font-variant-numeric: tabular-nums; }
 .offers-table th { --bs-table-bg: var(--bs-tertiary-bg); color: var(--bs-secondary-color); font-weight: 500; font-size: .875rem; }
@@ -81,8 +83,12 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--bs-link-color);
 .offers-table td:first-child { width: 45%; }
 .offers-table tr:last-child td { border-bottom: 0; }
 
-@media (max-width: 767px) {
-  .results-search { width: 100%; }
+@media (min-width: 576px) and (max-width: 991px) {
+  .results-search { flex: 1; }
+}
+
+@media (max-width: 575px) {
+  .results-search, .results-sort { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {

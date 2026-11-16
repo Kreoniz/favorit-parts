@@ -1,6 +1,14 @@
 const isRecord = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const text = (value) => typeof value === 'string' ? value.trim() : '';
 
+export const SORT_OPTIONS = [
+  { value: 'default', label: 'По умолчанию' },
+  { value: 'price-asc', label: 'Сначала дешевле' },
+  { value: 'price-desc', label: 'Сначала дороже' },
+  { value: 'stock-desc', label: 'Больше в наличии' },
+  { value: 'name-asc', label: 'По названию' },
+];
+
 export function apiErrorMessage(error) {
   const description = Array.isArray(error) ? error.join(' ') : String(error);
   const messages = [
@@ -39,6 +47,22 @@ export function filterParts(parts, query) {
   return parts.filter((part) => {
     const searchable = normalize(`${part.name} ${part.brand} ${part.number}`);
     return terms.every((term) => searchable.includes(term));
+  });
+}
+
+export function getOfferRows(parts, sort = 'default') {
+  const rows = parts.flatMap((part) => (part.offers.length ? part.offers : [null]).map((offer) => ({ part, offer })));
+  if (sort === 'name-asc') return rows.sort((a, b) => a.part.name.localeCompare(b.part.name, 'ru'));
+  if (!['price-asc', 'price-desc', 'stock-desc'].includes(sort)) return rows;
+  const key = sort === 'stock-desc' ? 'stock' : 'price';
+  const direction = sort === 'price-asc' ? 1 : -1;
+  return rows.sort((a, b) => {
+    const left = a.offer?.[key] ?? null;
+    const right = b.offer?.[key] ?? null;
+    // Unknown prices/stocks and goods without offers always remain at the end.
+    if (left === null) return right === null ? 0 : 1;
+    if (right === null) return -1;
+    return (left - right) * direction;
   });
 }
 
