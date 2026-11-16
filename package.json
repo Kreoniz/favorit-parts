@@ -1,0 +1,8 @@
+{
+  "name": "favorit-parts-design-prototype",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prototype": "bun prototypes/serve.js"
+  }
+}

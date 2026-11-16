@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Favorit Parts — макет для ревью</title>
+  <style>
+    /* Throwaway prototype: three layouts on one route, switched with ?variant=A|B|C.
+       Question: which layout best supports number → brand → warehouse offers? */
+    :root {
+      --ink: var(--foreground, #202d29);
+      --dim: var(--muted-foreground, #6c7772);
+      --paper: var(--card, #fff);
+      --soft: var(--secondary, #f4f6f4);
+      --line: var(--border, #e0e6e1);
+      --green: var(--success, #287253);
+      --green-ink: var(--success-foreground, #fff);
+      --green-wash: color-mix(in srgb, var(--green) 9%, var(--paper));
+      --red: var(--destructive, #c34141);
+      --round: var(--radius, 12px);
+      font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+      color: var(--ink);
+      font-size: 14px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    button, input, select { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--green) 45%, transparent); outline-offset: 3px;
+    }
+    button { color: inherit; }
+    svg { width: 19px; height: 19px; flex-shrink: 0; vertical-align: middle; }
+    .app { max-width: 1120px; margin: 0 auto; padding-bottom: 132px; }
+    .topbar { height: 52px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); gap: 16px; }
+    .wordmark { font-weight: 760; font-size: 17px; letter-spacing: -.7px; display: flex; align-items: center; gap: 9px; white-space: nowrap; }
+    .logo { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; background: var(--green); color: var(--green-ink); }
+    .wordmark .parts { font-weight: 430; color: var(--dim); }
+    .mock-note { display: flex; align-items: center; gap: 6px; color: var(--dim); font-size: 11px; }
+    .mock-note .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+    main { padding-top: 30px; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: clamp(26px, 4.1vw, 36px); font-weight: 650; letter-spacing: -1.25px; line-height: 1.15; }
+    h2 { font-size: 19px; font-weight: 630; letter-spacing: -.45px; }
+    h3 { font-size: 15px; font-weight: 620; }
+    .eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: var(--dim); display: block; margin-bottom: 11px; }
+    .subtitle { color: var(--dim); margin-top: 10px; font-size: 13px; line-height: 1.6; }
+    .panel { background: var(--paper); border: 1px solid var(--line); border-radius: var(--round); }
+    .search-panel { padding: 21px; margin-top: 25px; }
+    .step-heading { display: flex; align-items: center; gap: 9px; font-weight: 620; margin-bottom: 16px; }
+    .step-number { font-size: 10px; font-weight: 700; width: 22px; height: 22px; border: 1px solid var(--line); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: var(--dim); }
+    .step-number.active { background: var(--green-wash); color: var(--green); border-color: color-mix(in srgb, var(--green) 22%, var(--line)); }
+    .field-label { display: block; font-size: 12px; margin-bottom: 7px; font-weight: 600; }
+    .search-form { display: flex; align-items: center; gap: 10px; }
+    .search-box { display: flex; align-items: center; position: relative; flex: 1; min-width: 0; }
+    .search-box svg { position: absolute; left: 14px; color: var(--dim); pointer-events: none; }
+    .article-input { width: 100%; min-width: 0; height: 47px; padding: 0 42px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); font-size: 16px; letter-spacing: .4px; }
+    .article-input:focus { border-color: var(--green); outline: 3px solid var(--green-wash); }
+    .clear-input { position: absolute; right: 5px; padding: 5px; height: 34px; width: 34px; border: 0; border-radius: 5px; background: transparent; color: var(--dim); display: grid; place-items: center; }
+    .clear-input:hover { background: var(--soft); }
+    .clear-input svg { position: static; width: 15px; height: 15px; }
+    .search-hint { font-size: 11px; color: var(--dim); margin-top: 8px; line-height: 1.5; }
+    .search-hint button { border: 0; border-bottom: 1px dashed var(--dim); color: var(--ink); background: none; padding: 0; font-size: inherit; }
+    .brand-area { margin-top: 21px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .minor-heading { display: flex; justify-content: space-between; gap: 10px; align-items: center; font-size: 12px; margin-bottom: 11px; }
+    .minor-heading span { color: var(--dim); font-size: 11px; }
+    .minor-heading > span { white-space: nowrap; }
+    .brands { display: flex; flex-wrap: wrap; gap: 8px; }
+    .brand { display: flex; align-items: center; gap: 12px; background: var(--paper); border: 1px solid var(--line); border-radius: 7px; padding: 11px 14px; min-height: 44px; font-size: 12px; font-weight: 600; transition: background .15s, border-color .15s; }
+    .brand:hover { border-color: var(--green); background: var(--green-wash); }
+    .brand.selected { background: var(--green); color: var(--green-ink); border-color: var(--green); }
+    .brand svg { width: 15px; height: 15px; }
+    .results { margin-top: 27px; }
+    .results-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-bottom: 15px; }
+    .results-heading .step-heading { margin: 0 0 6px; }
+    .result-caption { color: var(--dim); font-size: 11px; line-height: 1.5; }
+    .context-line { font-size: 12px; margin-top: 8px; color: var(--dim); }
+    .context-line strong { color: var(--ink); font-weight: 600; }
+    .table-wrap { overflow-x: auto; border-radius: var(--round); }
+    table { width: 100%; min-width: 460px; border-collapse: collapse; font-size: 12px; text-align: left; }
+    th { font-size: 10px; color: var(--dim); font-weight: 600; padding: 13px 15px; background: var(--soft); border-bottom: 1px solid var(--line); white-space: nowrap; }
+    td { padding: 16px 15px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    tr:last-child td { border-bottom: 0; }
+    .part-name { font-weight: 590; font-size: 12px; line-height: 1.5; }
+    .part-detail { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-top: 5px; font-size: 10px; color: var(--dim); }
+    .number { font-variant-numeric: tabular-nums; }
+    .tag { display: inline-flex; align-items: center; font-size: 9px; border-radius: 4px; padding: 3px 5px; background: var(--soft); color: var(--dim); font-weight: 500; white-space: nowrap; }
+    .tag.original { color: var(--green); background: var(--green-wash); }
+    .stock { display: inline-flex; align-items: center; gap: 5px; color: var(--green); white-space: nowrap; font-size: 11px; }
+    .stock .stock-dot { width: 5px; height: 5px; background: currentColor; border-radius: 50%; }
+    .unavailable { color: var(--dim); font-size: 11px; white-space: nowrap; }
+    .price { font-size: 14px; font-weight: 650; white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; letter-spacing: -.3px; }
+    .price-missing { font-weight: 400; color: var(--dim); }
+    .align-right { text-align: right; }
+    .warehouse { color: var(--dim); white-space: nowrap; font-size: 11px; }
+    .footer-note { margin-top: 12px; font-size: 10px; color: var(--dim); display: flex; align-items: center; gap: 5px; line-height: 1.6; }
+    .footer-note svg { width: 13px; height: 13px; }
+    .empty { text-align: center; padding: 39px 20px; }
+    .empty-icon { margin: 0 auto 12px; width: 42px; height: 42px; display: grid; place-items: center; color: var(--dim); background: var(--soft); border-radius: 50%; }
+    .empty p { margin: 8px auto 0; font-size: 12px; color: var(--dim); max-width: 300px; line-height: 1.6; }
+    .retry { margin-top: 16px; background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 7px; padding: 10px 16px; min-height: 40px; font-size: 12px; }
+    .empty.error .empty-icon { color: var(--red); background: color-mix(in srgb, var(--red) 8%, var(--paper)); }
+    .loading-label { display: flex; align-items: center; gap: 9px; color: var(--dim); font-size: 12px; padding: 13px 0; }
+    .spinner { width: 15px; height: 15px; border: 2px solid var(--line); border-top-color: var(--green); border-radius: 50%; animation: spin .85s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .skeletons { padding: 0 19px; }
+    .skeleton-row { display: flex; gap: 20px; padding: 22px 0; border-bottom: 1px solid var(--line); }
+    .skeleton-row:last-child { border-bottom: 0; }
+    .skeleton-row span { display: block; background: var(--soft); border-radius: 4px; height: 13px; flex: 1; }
+    .skeleton-row span:first-child { flex: 2.3; }
+    /* B: persistent master-detail workspace. */
+    .workspace-title { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 23px; }
+    .workspace-title h1 { font-size: 27px; }
+    .workspace { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 19px; align-items: start; }
+    .sidebar { padding: 17px; }
+    .sidebar .brand-area { margin-top: 19px; padding-top: 16px; }
+    .sidebar .brands { flex-direction: column; gap: 6px; }
+    .sidebar .brand { width: 100%; justify-content: space-between; padding: 12px 11px; font-size: 11px; }
+    .sidebar .minor-heading { font-size: 11px; }
+    .sidebar .article-input { font-size: 14px; height: 43px; padding-left: 34px; }
+    .sidebar .search-box > svg { left: 10px; width: 16px; }
+    .workspace-results { min-width: 0; }
+    .workspace-results .results { margin-top: 0; }
+    .workspace-results .results-heading { min-height: 57px; align-items: flex-start; }
+    .workspace-results th, .workspace-results td { padding-left: 11px; padding-right: 11px; }
+    .workspace-results table { min-width: 390px; }
+    .workspace-results .result-caption { max-width: 115px; text-align: right; }
+    .selected-brand-title { display: flex; gap: 9px; align-items: center; }
+    .brand-initial { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--green); font-size: 12px; font-weight: 750; }
+    /* C: catalogue with offers grouped under each part. */
+    .catalogue-intro { display: grid; grid-template-columns: .9fr 1.1fr; gap: 24px; align-items: center; padding: 8px 0 25px; border-bottom: 1px solid var(--line); }
+    .catalogue-intro h1 { font-size: 30px; }
+    .catalogue-intro .subtitle { font-size: 12px; max-width: 280px; }
+    .catalogue-intro .field-label { font-size: 11px; }
+    .catalogue-brands { padding: 19px 0; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--line); }
+    .catalogue-brands .minor-heading { margin: 0; white-space: nowrap; }
+    .catalogue-brands .brand { min-height: 40px; padding: 9px 12px; font-size: 11px; }
+    .catalogue .results-heading { margin-top: 24px; }
+    .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .part-card { overflow: hidden; }
+    .part-card-head { padding: 17px; border-bottom: 1px solid var(--line); }
+    .part-card-top { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-bottom: 15px; }
+    .part-card-brand { font-weight: 720; font-size: 12px; letter-spacing: .3px; }
+    .part-card h3 { font-size: 15px; margin-bottom: 7px; }
+    .part-card-number { color: var(--dim); font-size: 11px; }
+    .offer-row { display: grid; grid-template-columns: 1fr auto auto; gap: 14px; align-items: center; padding: 14px 17px; border-bottom: 1px solid var(--line); }
+    .offer-row:last-child { border-bottom: 0; }
+    .offer-row .price { font-size: 13px; }
+    .no-offers { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--dim); font-size: 11px; padding: 18px 17px; }
+    /* Review controls: isolated from product UI, absent from the future app. */
+    .review-controls { position: fixed; z-index: 5; left: 50%; bottom: 13px; transform: translateX(-50%); width: max-content; max-width: calc(100% - 24px); padding: 9px 10px 7px; border: 1px solid var(--line); border-radius: 13px; background: var(--paper); box-shadow: 0 5px 28px color-mix(in srgb, var(--ink) 13%, transparent); }
+    .review-row { display: flex; align-items: center; gap: 9px; }
+    .review-arrow { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 7px; background: var(--soft); }
+    .review-arrow:hover { border-color: var(--green); }
+    .variant-label { text-align: center; min-width: 156px; font-size: 11px; line-height: 1.5; }
+    .variant-label strong { font-weight: 700; }
+    .variant-label small { display: block; color: var(--dim); font-size: 9px; }
+    .scenario-control { padding-left: 9px; border-left: 1px solid var(--line); }
+    .scenario-control select { background: var(--soft); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; height: 34px; font-size: 11px; max-width: 140px; padding: 0 7px; }
+    .review-state { margin-top: 6px; text-align: center; font-family: var(--font-mono, monospace); font-size: 9px; color: var(--dim); }
+    @media (min-width: 900px) { .app { padding-left: 24px; padding-right: 24px; } }
+    @media (max-width: 619px) {
+      main { padding-top: 23px; }
+      .mock-note { font-size: 9px; }
+      .mock-note .mock-long { display: none; }
+      .wordmark { font-size: 16px; }
+      .search-panel { padding: 16px; margin-top: 21px; }
+      .search-hint { font-size: 10px; }
+      .brand { flex: 1 1 calc(50% - 4px); justify-content: space-between; padding: 11px 12px; }
+      .brands { gap: 7px; }
+      .result-caption { max-width: 115px; text-align: right; font-size: 10px; }
+      .workspace { grid-template-columns: 1fr; gap: 20px; }
+      .workspace-title { margin-bottom: 17px; }
+      .workspace-title h1 { font-size: 26px; }
+      .sidebar { padding: 16px; }
+      .sidebar .brands { flex-direction: row; }
+      .sidebar .brand { width: auto; min-width: 40%; }
+      .workspace-results .results-heading { min-height: 45px; }
+      .catalogue-intro { grid-template-columns: 1fr; gap: 21px; padding-top: 0; }
+      .catalogue-intro h1 { font-size: 29px; }
+      .catalogue-intro .subtitle { max-width: none; }
+      .catalogue-brands { display: block; }
+      .catalogue-brands .minor-heading { margin-bottom: 11px; }
+      .catalogue-brands .brand { font-size: 10px; }
+      .cards { grid-template-columns: 1fr; }
+      .variant-label { min-width: 132px; font-size: 10px; }
+      .review-row { gap: 5px; }
+      .review-arrow { width: 30px; height: 32px; }
+      .scenario-control { padding-left: 5px; }
+      .scenario-control select { font-size: 10px; max-width: 105px; padding: 0 3px; }
+      .review-state { font-size: 8px; }
+      .table-wrap table { min-width: 0; display: block; }
+      .table-wrap thead { display: none; }
+      .table-wrap tbody { display: block; }
+      .table-wrap tr { display: grid; grid-template-columns: 1fr auto; padding: 14px 15px; border-bottom: 1px solid var(--line); }
+      .table-wrap tr:last-child { border-bottom: 0; }
+      .table-wrap td { border: 0; padding: 0; }
+      .table-wrap td:first-child { grid-column: 1 / -1; padding-bottom: 12px; }
+      .table-wrap td:nth-child(2) { grid-column: 1; padding: 0 0 5px; }
+      .table-wrap td:nth-child(3) { grid-column: 1; }
+      .table-wrap td:last-child { grid-column: 2; grid-row: 2 / 4; align-self: center; padding-left: 10px; }
+      .table-wrap .part-name { font-size: 13px; }
+      .table-wrap .part-detail { font-size: 11px; }
+      .table-wrap .tag { font-size: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <div class="app" id="app"></div>
+  <div id="controls"></div>
+  <script>
+    const icons = {
+      search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/>',
+      check: '<path d="m5 12 4 4L19 6"/>',
+      right: '<path d="m9 5 7 7-7 7"/>',
+      left: '<path d="m15 5-7 7 7 7"/>',
+      close: '<path d="m6 6 12 12M6 18 18 6"/>',
+      box: '<path d="m12 3 9 5v9l-9 5-9-5V8l9-5ZM3 8l9 5 9-5M12 13v9M7.5 5.5l9 5"/>',
+      info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.1"/>',
+      alert: '<path d="m12 3 10 18H2L12 3Z"/><path d="M12 9v5M12 17v.1"/>',
+    };
+    const icon = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]}</svg>`;
+    const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+    const brands = ['ZEN', 'NGK/NTK', 'CAFFARO', 'HAFFEN'];
+    const variantNames = { A: 'Последовательный поиск', B: 'Рабочая область', C: 'Карточки деталей' };
+    const initialVariant = new URLSearchParams(location.search).get('variant');
+    let variant = variantNames[initialVariant] ? initialVariant : 'A';
+    let number = '0189';
+    let selectedBrand = 'ZEN';
+    let stage = 'offers';
+    let scenario = 'offers';
+    let pending;
+
+    // Illustrative fixture, deliberately NOT a copy of live inventory or prices.
+    function parts() {
+      const kind = selectedBrand === 'CAFFARO'
+        ? { name: 'Ролик натяжителя ремня', alternatives: [['INA', '531 0760 10'], ['SKF', 'VKM 31034']] }
+        : selectedBrand === 'NGK/NTK'
+          ? { name: 'Лямбда-зонд', alternatives: [['BOSCH', '0 258 006 537'], ['DENSO', 'DOX-0114']] }
+          : { name: 'Бендикс стартера', alternatives: [['TESLA TECHNICS', 'TT61027'], ['CARGO', '130432']] };
+      return [
+        { brand: selectedBrand || 'ZEN', number: selectedBrand === 'CAFFARO' ? '01-89' : number, name: kind.name, original: true, offers: [{ warehouse: 'МСК РС', stock: 4, price: 1040.6 }, { warehouse: 'СПБ', stock: 2, price: 1186 }] },
+        { brand: kind.alternatives[0][0], number: kind.alternatives[0][1], name: kind.name, original: false, offers: [{ warehouse: 'МСК', stock: 3, price: 912.4 }] },
+        { brand: kind.alternatives[1][0], number: kind.alternatives[1][1], name: kind.name, original: false, offers: [] },
+      ];
+    }
+    const price = value => new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value) + ' ₽';
+    const stock = value => `<span class="stock"><span class="stock-dot"></span>${value} шт.</span>`;
+    const tag = part => `<span class="tag ${part.original ? 'original' : ''}">${part.original ? 'Запрошенная деталь' : 'Аналог'}</span>`;
+    const header = () => `<header class="topbar"><div class="wordmark"><span class="logo">${icon('box')}</span><span>favorit<span class="parts"> parts</span></span></div><span class="mock-note"><span class="dot"></span>Макет<span class="mock-long"> · демонстрационные данные</span></span></header>`;
+    function searchField() {
+      return `<label class="field-label" for="article">Артикул детали</label><form class="search-form" id="search-form"><div class="search-box">${icon('search')}<input class="article-input" id="article" name="article" placeholder="Например, 0189" value="${escapeHtml(number)}" autocomplete="off" spellcheck="false" aria-describedby="search-hint">${number ? `<button class="clear-input" type="button" data-action="clear" aria-label="Очистить артикул">${icon('close')}</button>` : ''}</div></form><p class="search-hint" id="search-hint">Поиск после ввода · пример: <button type="button" data-action="example">0189</button></p>`;
+    }
+    function brandButtons() {
+      return `<div class="brands" aria-label="Производители">${brands.map(brand => `<button type="button" class="brand ${brand === selectedBrand ? 'selected' : ''}" data-brand="${escapeHtml(brand)}" aria-pressed="${brand === selectedBrand}">${escapeHtml(brand)}${icon(brand === selectedBrand ? 'check' : 'right')}</button>`).join('')}</div>`;
+    }
+    function statePanel(type) {
+      const states = {
+        empty: ['search', 'По этому артикулу ничего не найдено', 'Проверьте номер детали или попробуйте другой артикул.'],
+        error: ['alert', 'Не удалось получить данные', 'Сервис временно недоступен. Попробуйте повторить запрос.'],
+        idle: ['search', 'Начните с артикула', 'Введите номер детали, чтобы найти производителей.'],
+        brands: ['box', 'Выберите производителя', 'После выбора появятся деталь, её аналоги и складские предложения.'],
+      };
+      const [symbol, title, description] = states[type];
+      return `<div class="empty ${type}" role="status"><div class="empty-icon">${icon(symbol)}</div><h3>${title}</h3><p>${description}</p>${type === 'error' ? '<button class="retry" type="button" data-action="retry">Повторить запрос</button>' : ''}</div>`;
+    }
+    function brandSection(compact = false) {
+      if (['loadingBrands', 'loading'].includes(stage)) return '<div class="loading-label" role="status"><span class="spinner"></span>Ищем производителей…</div>';
+      if (['empty', 'error', 'idle'].includes(stage)) return compact ? '<p class="search-hint">Производитель пока не выбран</p>' : statePanel(stage);
+      return `<div class="minor-heading"><strong>${compact ? 'Производители' : 'Выберите производителя'}</strong><span>Найдено: 4</span></div>${brandButtons()}`;
+    }
+    function offersTable() {
+      return `<div class="panel table-wrap"><table><thead><tr><th>Деталь / производитель</th><th>Склад</th><th>Остаток</th><th class="align-right">Цена</th></tr></thead><tbody>${parts().map(part => {
+        const offers = part.offers.length ? part.offers : [null];
+        return offers.map((offer, index) => `<tr><td><div class="part-name">${escapeHtml(part.name)}</div><div class="part-detail"><span>${escapeHtml(part.brand)} · <span class="number">${escapeHtml(part.number)}</span></span>${index === 0 ? tag(part) : ''}</div></td><td class="warehouse">${offer ? escapeHtml(offer.warehouse) : '—'}</td><td>${offer ? stock(offer.stock) : '<span class="unavailable">Нет в наличии</span>'}</td><td class="price ${offer ? '' : 'price-missing'}">${offer ? price(offer.price) : '—'}</td></tr>`).join('');
+      }).join('')}</tbody></table></div>`;
+    }
+    function offersCards() {
+      return `<div class="cards">${parts().map(part => `<article class="panel part-card"><div class="part-card-head"><div class="part-card-top"><span class="part-card-brand">${escapeHtml(part.brand)}</span>${tag(part)}</div><h3>${escapeHtml(part.name)}</h3><span class="part-card-number">Артикул <span class="number">${escapeHtml(part.number)}</span></span></div>${part.offers.length ? part.offers.map(offer => `<div class="offer-row"><span class="warehouse">${escapeHtml(offer.warehouse)}</span>${stock(offer.stock)}<span class="price">${price(offer.price)}</span></div>`).join('') : '<div class="no-offers"><span>Нет складских предложений</span><span>Цена —</span></div>'}</article>`).join('')}</div>`;
+    }
+    function loadingOffers() {
+      return `<div class="panel"><div class="loading-label" role="status" style="padding:18px 19px 5px"><span class="spinner"></span>Получаем предложения и аналоги…</div><div class="skeletons" aria-hidden="true">${Array.from({ length: 3 }, () => '<div class="skeleton-row"><span></span><span></span><span></span></div>').join('')}</div></div>`;
+    }
+    function resultsContent(cards = false) {
+      if (['loading', 'loadingBrands', 'loadingOffers'].includes(stage)) return loadingOffers();
+      if (stage !== 'offers') return `<div class="panel">${statePanel(stage)}</div>`;
+      return `${cards ? offersCards() : offersTable()}<p class="footer-note">${icon('info')}Цена и остаток указаны для каждого склада. Данные макета вымышлены.</p>`;
+    }
+    function resultsHeading() {
+      return `<div class="results-heading"><div><div class="step-heading"><span class="step-number ${stage === 'offers' ? 'active' : ''}">2</span><h2>Предложения и аналоги</h2></div><p class="context-line">${selectedBrand ? `<strong>${escapeHtml(selectedBrand)}</strong> <span> / </span> ${escapeHtml(number)}` : 'Сначала выберите производителя'}</p></div>${stage === 'offers' ? '<span class="result-caption">3 позиции<br>3 складских предложения</span>' : ''}</div>`;
+    }
+    function VariantA() {
+      return `${header()}<main><span class="eyebrow">Каталог запчастей</span><h1>Поиск запчастей<br>и аналогов</h1><p class="subtitle">Найдите производителя, затем сравните цены и наличие аналогов.</p><section class="panel search-panel" aria-label="Поиск производителя"><div class="step-heading"><span class="step-number active">1</span>Артикул и производитель</div>${searchField()}<div class="brand-area">${brandSection()}</div></section>${['brands', 'offers', 'loadingOffers'].includes(stage) ? `<section class="results">${resultsHeading()}${resultsContent()}</section>` : ''}</main>`;
+    }
+    function VariantB() {
+      return `${header()}<main><div class="workspace-title"><div><span class="eyebrow">Каталог запчастей</span><h1>Поиск и подбор</h1></div><span class="result-caption">От артикула<br>к предложениям</span></div><div class="workspace"><aside class="panel sidebar" aria-label="Артикул и производители">${searchField()}<div class="brand-area">${brandSection(true)}</div></aside><section class="workspace-results"><div class="results-heading"><div class="selected-brand-title"><span class="brand-initial">${selectedBrand ? escapeHtml(selectedBrand.slice(0, 2)) : icon('box')}</span><div><h2>${escapeHtml(selectedBrand || 'Предложения')}</h2><p class="context-line">${escapeHtml(number || 'Введите артикул')}${selectedBrand ? ' · аналоги и наличие' : ''}</p></div></div>${stage === 'offers' ? '<span class="result-caption">3 позиции<br>3 предложения</span>' : ''}</div>${resultsContent()}</section></div></main>`;
+    }
+    function VariantC() {
+      return `${header()}<main class="catalogue"><div class="catalogue-intro"><div><span class="eyebrow">Каталог запчастей</span><h1>Запчасти<br>и их аналоги</h1><p class="subtitle">Сравните предложения по каждому товару и выберите подходящий склад.</p></div><div>${searchField()}</div></div><section class="catalogue-brands" aria-label="Выбор производителя">${brandSection(true)}</section><section>${resultsHeading()}${resultsContent(true)}</section></main>`;
+    }
+    function PrototypeSwitcher() {
+      const labels = { offers: 'Предложения', brands: 'Выбор бренда', loading: 'Загрузка', empty: 'Пустой ответ', error: 'Ошибка сети' };
+      return `<aside class="review-controls" aria-label="Ревью макета"><div class="review-row"><button type="button" class="review-arrow" data-action="previous" aria-label="Предыдущий вариант">${icon('left')}</button><div class="variant-label"><strong>${variant} · ${variantNames[variant]}</strong><small>Вариант ${{ A: 1, B: 2, C: 3 }[variant]} из 3 · ← →</small></div><button type="button" class="review-arrow" data-action="next" aria-label="Следующий вариант">${icon('right')}</button><label class="scenario-control"><select id="scenario" aria-label="Сценарий макета">${Object.entries(labels).map(([value, label]) => `<option value="${value}" ${scenario === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label></div><p class="review-state">МОК · ${escapeHtml(number || '∅')} / ${escapeHtml(selectedBrand || '∅')} · ${escapeHtml(stage)}</p></aside>`;
+    }
+    function render() {
+      const input = document.activeElement?.id === 'article' ? document.activeElement : null;
+      const selection = input ? [input.selectionStart, input.selectionEnd] : null;
+      document.getElementById('app').innerHTML = ({ A: VariantA, B: VariantB, C: VariantC })[variant]();
+      document.getElementById('controls').innerHTML = PrototypeSwitcher();
+      if (selection) {
+        const replacement = document.getElementById('article');
+        replacement.focus({ preventScroll: true });
+        replacement.setSelectionRange(...selection);
+      }
+    }
+    function switchVariant(direction) {
+      const keys = Object.keys(variantNames);
+      variant = keys[(keys.indexOf(variant) + direction + keys.length) % keys.length];
+      const url = new URL(location.href);
+      url.searchParams.set('variant', variant);
+      try { history.replaceState(null, '', url); } catch { /* Embedded review frames may disallow history access. */ }
+      render();
+      console.log('Prototype variant:', variant, { number, selectedBrand, stage });
+    }
+    function search() {
+      clearTimeout(pending);
+      selectedBrand = '';
+      scenario = 'brands';
+      if (!number.trim()) { stage = 'idle'; render(); return; }
+      stage = 'loadingBrands';
+      render();
+      pending = setTimeout(() => { stage = number.replace(/[-\s]/g, '') === '0189' ? 'brands' : 'empty'; render(); }, 450);
+    }
+    document.addEventListener('input', event => {
+      if (event.target.id !== 'article') return;
+      number = event.target.value;
+      clearTimeout(pending);
+      pending = setTimeout(search, 400);
+    });
+    document.addEventListener('submit', event => { if (event.target.id === 'search-form') { event.preventDefault(); search(); } });
+    document.addEventListener('change', event => {
+      if (event.target.id !== 'scenario') return;
+      clearTimeout(pending);
+      scenario = event.target.value;
+      stage = scenario === 'loading' ? 'loadingOffers' : scenario;
+      number = '0189';
+      selectedBrand = ['offers', 'loading'].includes(scenario) ? 'ZEN' : '';
+      render();
+    });
+    document.addEventListener('click', event => {
+      const brandButton = event.target.closest('[data-brand]');
+      if (brandButton) {
+        clearTimeout(pending);
+        selectedBrand = brandButton.dataset.brand;
+        stage = 'loadingOffers';
+        scenario = 'offers';
+        render();
+        pending = setTimeout(() => { stage = 'offers'; render(); }, 350);
+        return;
+      }
+      const action = event.target.closest('[data-action]')?.dataset.action;
+      if (action === 'previous') switchVariant(-1);
+      if (action === 'next') switchVariant(1);
+      if (action === 'clear') { number = ''; search(); document.getElementById('article').focus(); }
+      if (action === 'example') { number = '0189'; search(); }
+      if (action === 'retry') { number = number || '0189'; search(); }
+    });
+    document.addEventListener('keydown', event => {
+      if (event.target.closest('input, textarea, select, [contenteditable]')) return;
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        event.preventDefault();
+        switchVariant(event.key === 'ArrowLeft' ? -1 : 1);
+      }
+    });
+    render();
+  </script>
+</body>
+</html>
