@@ -119,7 +119,15 @@ bun run size
 
 Workflow `.github/workflows/pages.yml` устанавливает зависимости из lockfile, запускает тесты, собирает и публикует приложение после push в `main`. В pull request выполняются только тесты и сборка.
 
-В настройках Pages используется источник **GitHub Actions**. Для повторной публикации достаточно push в `main`; также можно запустить workflow **Check and deploy to Pages** вручную из `main`.
+В настройках Pages используется источник **GitHub Actions**. Workflow настроен на push в `main`; также можно запустить **Check and deploy to Pages** вручную из `main`.
+
+Ручной запуск через CLI:
+
+```sh
+gh workflow run pages.yml --repo Kreoniz/favorit-parts --ref main
+```
+
+При настройке 16.11.2026 ручная сборка и публикация прошли успешно. Автозапуск на push подтвердить не удалось: GitHub не создал push-запуски при активном workflow и включённых Actions.
 
 `base: './'` позволяет разместить сборку как в корне домена, так и по пути `/<имя-репозитория>/`. Сервер приложению не нужен: HTTPS API разрешает CORS для обычных GET-запросов.
 
